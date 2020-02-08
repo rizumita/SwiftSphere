@@ -1,3 +1,2 @@
 # SwiftSphere
-
-A description of this package.
+SwiftSphere is an architecture pattern framework for SwiftUI
