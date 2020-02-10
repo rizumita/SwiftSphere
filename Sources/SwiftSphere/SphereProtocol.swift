@@ -9,6 +9,7 @@ import Foundation
 #if canImport(Combine)
 import Combine
 #endif
+import CombineAsync
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public protocol SphereProtocol {
@@ -18,7 +19,7 @@ public protocol SphereProtocol {
 
     static func proxy(context: Context) -> SphereProxy<Self>
 
-    static func update(event: Event, context: Context) -> AnyPublisher<Model, Never>
+    static func update(event: Event, context: Context) -> Async<Model>
     static func makeModel(context: Context) -> Model
 }
 

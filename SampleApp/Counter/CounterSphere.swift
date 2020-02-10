@@ -5,48 +5,53 @@
 import Foundation
 import Combine
 import SwiftSphere
+import CombineAsync
 
 struct CounterSphere: SphereProtocol {
     struct Model {
         var count: Int
         var history: [Step]
     }
-
+    
     enum Event {
         case increase
         case increaseAutomatically
         case stopIncreaseAutomatically
         case decrease
     }
-
-    static func update(event: Event, context: Context) -> AnyPublisher<Model, Never> {
-        switch event {
-        case .increase:
-            context.countRepository.increase()
-
-        case .increaseAutomatically:
-            return context.countRepository.increaseAutomatically(interval: 2.0, until: context.until)
-                                          .flatMap { self.makeModelAsync(context: context) }.eraseToAnyPublisher()
-
-        case .stopIncreaseAutomatically:
-            context.until.send(())
-
-        case .decrease:
-            context.countRepository.decrease()
+    
+    static func update(event: Event, context: Context) -> Async<Model> {
+        async { yield in
+            switch event {
+            case .increase:
+                context.countRepository.increase()
+                
+            case .increaseAutomatically:
+                yield(context.countRepository.increaseAutomatically(interval: 2.0, until: context.until)
+                    .setFailureType(to: Error.self).flatMap { self.makeModelAsync(context: context) })
+                
+            case .stopIncreaseAutomatically:
+                context.until.send(())
+                
+            case .decrease:
+                context.countRepository.decrease()
+            }
+        
+            yield(makeModelAsync(context: context))
         }
-
-        return makeModelAsync(context: context)
     }
-
+    
     static func makeModel(context: Context) -> Model {
         Model(count: context.countRepository.count, history: context.countRepository.history)
     }
-
-    static func makeModelAsync(context: Context) -> AnyPublisher<Model, Never> {
-        context.countRepository.historyPublisher.map { Model(count: context.countRepository.count, history: $0) }
-                                                .prefix(1).eraseToAnyPublisher()
+    
+    static func makeModelAsync(context: Context) -> Async<Model> {
+        async { yield in
+            let history = try await(context.countRepository.historyPublisher.first())
+            yield(Model(count: context.countRepository.count, history: history))
+        }
     }
-
+    
     struct Context {
         let countRepository: CountRepositoryProtocol
         let until = PassthroughSubject<(), Never>()

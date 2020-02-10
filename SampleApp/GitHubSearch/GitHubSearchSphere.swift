@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import SwiftSphere
+import CombineAsync
 
 struct GitHubSearchSphere: SphereProtocol {
     struct Model {
@@ -12,29 +13,30 @@ struct GitHubSearchSphere: SphereProtocol {
         var selectedRepo: GitHubRepo? = .none
         var error: String? = .none
     }
-
+    
     enum Event {
         case search(String)
         case selectRepo(GitHubRepo?)
     }
-
-    static func update(event: Event, context: GitHubReposRepositoryProtocol) -> AnyPublisher<Model, Never> {
-        switch event {
-        case .search(let text):
-            if text.isEmpty {
-                return Just(Model(repos: [])).eraseToAnyPublisher()
-            } else {
-                return context
-                    .search(text)
-                    .map { Model(repos: $0) }
-                    .catch { Just(Model(error: $0.localizedDescription)) }
-                    .eraseToAnyPublisher()
+    
+    static func update(event: Event, context: GitHubReposRepositoryProtocol) -> Async<Model> {
+        async { yield in
+            switch event {
+            case .search(let text):
+                if text.isEmpty {
+                    yield(Model(repos: []))
+                } else {
+                    yield(context
+                        .search(text)
+                        .map { Model(repos: $0) }
+                        .catch { Just(Model(error: $0.localizedDescription)) })
+                }
+                
+            case .selectRepo(let repo):
+                yield(Model(repos: context.searchedRepos, selectedRepo: repo))
             }
-
-        case .selectRepo(let repo):
-            return Just(Model(repos: context.searchedRepos, selectedRepo: repo)).eraseToAnyPublisher()
         }
     }
-
+    
     static func makeModel(context: GitHubReposRepositoryProtocol) -> Model { Model() }
 }
