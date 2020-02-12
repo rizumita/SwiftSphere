@@ -15,7 +15,7 @@ struct ContentView: View {
                 Spacer()
 
                 RepositoryProvider.ready(GitHubReposRepository()) { repository in
-                    SphereProvider.ready(GitHubSearchSphere.self, context: repository) { sphere in
+                    SphereProvider<GitHubSearchSphere>.ready(context: repository) { sphere in
                         NavigationLink(destination: GitHubSearchView().environmentObject(sphere),
                                        label: { Text("Search GitHub Repositories") })
                     }
@@ -24,7 +24,7 @@ struct ContentView: View {
                 Spacer()
 
                 RepositoryProvider.ready(CountRepository()) { repository in
-                    SphereProvider.ready(CounterSphere.self, context: .init(countRepository: repository)) { sphere in
+                    SphereProvider<CounterSphere>.ready(context: .init(countRepository: repository)) { sphere in
                         NavigationLink(destination: CounterView().environmentObject(sphere),
                                        label: { Text("Counter") })
                     }

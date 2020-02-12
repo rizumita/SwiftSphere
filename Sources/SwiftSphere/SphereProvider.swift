@@ -7,31 +7,27 @@
 
 import SwiftUI
 
+private var sphereProxies: [AnyHashable: Any] = [AnyHashable: Any]()
+private let proxyQueue = DispatchQueue(label: "SwiftSphere.SphereProvider.proxyQueue")
+
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-public class SphereProvider {
-    private static var sphereProxies: [AnyHashable: Any] = [AnyHashable: Any]()
-    private static let proxyQueue = DispatchQueue(label: "SwiftSphere.SphereProvider.proxyQueue")
+public class SphereProvider<Sphere> where Sphere: SphereProtocol {
 
     @discardableResult
-    public static func ready<Sphere>(_ sphereType: Sphere.Type = Sphere.self,
-                                     context: Sphere.Context) -> Sphere.Proxy where Sphere: SphereProtocol {
-        let proxy = sphereType.proxy(context: context)
+    public static func ready(context: Sphere.Context) -> Sphere.Proxy {
+        let proxy = Sphere.proxy(context: context)
         store(proxy)
         return proxy
     }
 
     @discardableResult
-    public static func ready<Sphere, ID>(_ sphereType: Sphere.Type = Sphere.self,
-                                         context: Sphere.Context,
-                                         id: ID) -> Sphere.Proxy where Sphere: SphereProtocol, ID: Hashable {
-        let proxy = sphereType.proxy(context: context)
+    public static func ready<ID>(context: Sphere.Context, id: ID) -> Sphere.Proxy where ID: Hashable {
+        let proxy = Sphere.proxy(context: context)
         store(proxy, for: id)
         return proxy
     }
 
-    public static func ready<Sphere, V>(_ sphereType: Sphere.Type = Sphere.self,
-                                        context: Sphere.Context,
-                                        build: (Sphere.Proxy) -> V) -> V where Sphere: SphereProtocol {
+    public static func ready<V>(context: Sphere.Context, build: (Sphere.Proxy) -> V) -> V {
         if let sphereProxy = restore(Sphere.Proxy.self) {
             return build(sphereProxy)
         }
@@ -39,10 +35,9 @@ public class SphereProvider {
         return build(ready(context: context))
     }
 
-    public static func ready<Sphere, V, ID>(_ sphereType: Sphere.Type = Sphere.self,
-                                            context: Sphere.Context,
-                                            id: ID,
-                                            build: (Sphere.Proxy) -> V) -> V where Sphere: SphereProtocol, ID: Hashable {
+    public static func ready<V, ID>(context: Sphere.Context,
+                                    id: ID,
+                                    build: (Sphere.Proxy) -> V) -> V where ID: Hashable {
         if let sphereProxy: Sphere.Proxy = restore(Sphere.Proxy.self, for: id) {
             return build(sphereProxy)
         }
@@ -50,12 +45,11 @@ public class SphereProvider {
         return build(ready(context: context, id: id))
     }
 
-    public static func get<Sphere>(_ type: Sphere.Type = Sphere.self) -> Sphere.Proxy! where Sphere: SphereProtocol {
+    public static func get() -> Sphere.Proxy! {
         restore()
     }
 
-    public static func get<Sphere, ID>(_ type: Sphere.Type = Sphere.self,
-                                       id: ID) -> Sphere.Proxy! where Sphere: SphereProtocol, ID: Hashable {
+    public static func get<ID>(id: ID) -> Sphere.Proxy! where ID: Hashable {
         restore(for: id)
     }
 
@@ -89,7 +83,7 @@ public class SphereProvider {
             guard let value = value as? WeakRef,
                   value.object == nil
                 else { continue }
-            self.sphereProxies.removeValue(forKey: key)
+            sphereProxies.removeValue(forKey: key)
         }
     }
 }
