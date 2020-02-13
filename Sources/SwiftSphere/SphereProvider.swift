@@ -27,7 +27,7 @@ public class SphereProvider<Sphere> where Sphere: SphereProtocol {
         return proxy
     }
 
-    public static func ready<V>(context: Sphere.Context, build: (Sphere.Proxy) -> V) -> V {
+    public static func ready<V>(context: Sphere.Context, build: (Sphere.Proxy) -> V) -> some View where V: View {
         if let sphereProxy = restore(Sphere.Proxy.self) {
             return build(sphereProxy)
         }
@@ -37,7 +37,7 @@ public class SphereProvider<Sphere> where Sphere: SphereProtocol {
 
     public static func ready<V, ID>(context: Sphere.Context,
                                     id: ID,
-                                    build: (Sphere.Proxy) -> V) -> V where ID: Hashable {
+                                    build: (Sphere.Proxy) -> V) -> some View where ID: Hashable, V: View {
         if let sphereProxy: Sphere.Proxy = restore(Sphere.Proxy.self, for: id) {
             return build(sphereProxy)
         }
