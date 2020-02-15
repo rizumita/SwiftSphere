@@ -10,6 +10,7 @@ import SwiftUI
 #if canImport(Combine)
 import Combine
 #endif
+import CombineAsync
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public class SphereProxy<Sphere: SphereProtocol>: ObservableObject {
@@ -20,9 +21,16 @@ public class SphereProxy<Sphere: SphereProtocol>: ObservableObject {
     
     private let updateQueue = DispatchQueue(label: "SwiftSphere.SphereProxy.updateQueue")
     
-    init(context: Sphere.Context) {
+    static func spawn(context: Sphere.Context) -> Async<Sphere.Proxy> {
+        async { yield in
+            let model = try await(Sphere.makeModel(context: context))
+            yield(Sphere.Proxy(context: context, model: model))
+        }
+    }
+    
+    init(context: Sphere.Context, model: Sphere.Model) {
         self.context = context
-        self.model = Sphere.makeModel(context: self.context)
+        self.model = model
     }
     
     public func dispatch(_ event: Sphere.Event) {

@@ -38,5 +38,9 @@ struct GitHubSearchSphere: SphereProtocol {
         }
     }
     
-    static func makeModel(context: GitHubReposRepositoryProtocol) -> Model { Model() }
+    static func makeModel(context: GitHubReposRepositoryProtocol) -> Async<Model> {
+        async { yield in
+            yield(Model())
+        }
+    }
 }

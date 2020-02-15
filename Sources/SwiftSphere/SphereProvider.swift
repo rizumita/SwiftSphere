@@ -6,23 +6,33 @@
 //
 
 import SwiftUI
+#if canImport(Combine)
+import Combine
+#endif
 
 private var sphereProxies: [AnyHashable: Any] = [AnyHashable: Any]()
 private let proxyQueue = DispatchQueue(label: "SwiftSphere.SphereProvider.proxyQueue")
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public class SphereProvider<Sphere> where Sphere: SphereProtocol {
-
     @discardableResult
     public static func ready(context: Sphere.Context) -> Sphere.Proxy {
-        let proxy = Sphere.proxy(context: context)
+        if let sphereProxy = restore(Sphere.Proxy.self) {
+            return sphereProxy
+        }
+
+        let proxy = createProxy(context: context)
         store(proxy)
         return proxy
     }
 
     @discardableResult
     public static func ready<ID>(context: Sphere.Context, id: ID) -> Sphere.Proxy where ID: Hashable {
-        let proxy = Sphere.proxy(context: context)
+        if let sphereProxy: Sphere.Proxy = restore(Sphere.Proxy.self, for: id) {
+            return sphereProxy
+        }
+
+        let proxy = createProxy(context: context)
         store(proxy, for: id)
         return proxy
     }
@@ -84,6 +94,14 @@ public class SphereProvider<Sphere> where Sphere: SphereProtocol {
                   value.object == nil
                 else { continue }
             sphereProxies.removeValue(forKey: key)
+        }
+    }
+    
+    private static func createProxy(context: Sphere.Context) -> Sphere.Proxy {
+        do {
+            return try Sphere.proxy(context: context).await()
+        } catch {
+            fatalError("Provider can't ready \(String(describing: type(of: Sphere.Proxy.self))): \(error.localizedDescription)")
         }
     }
 }

@@ -13,23 +13,19 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 Spacer()
-
-                RepositoryProvider.ready(GitHubReposRepository()) { repository in
-                    SphereProvider<GitHubSearchSphere>.ready(context: repository) { sphere in
-                        NavigationLink(destination: GitHubSearchView().environmentObject(sphere),
-                                       label: { Text("Search GitHub Repositories") })
-                    }
+                
+                SphereProvider<GitHubSearchSphere>.ready(context: RepositoryProvider.ready(GitHubReposRepository())) { sphere in
+                    NavigationLink(destination: GitHubSearchView().environmentObject(sphere),
+                                   label: { Text("Search GitHub Repositories") })
                 }
-
+                
                 Spacer()
-
-                RepositoryProvider.ready(CountRepository()) { repository in
-                    SphereProvider<CounterSphere>.ready(context: .init(countRepository: repository)) { sphere in
-                        NavigationLink(destination: CounterView().environmentObject(sphere),
-                                       label: { Text("Counter") })
-                    }
+                
+                SphereProvider<CounterSphere>.ready(context: .init(countRepository: RepositoryProvider.ready(CountRepository()))) { sphere in
+                    NavigationLink(destination: CounterView().environmentObject(sphere),
+                                   label: { Text("Counter") })
                 }
-
+                
                 Spacer()
             }
         }

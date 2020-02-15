@@ -13,6 +13,10 @@ private var repositories: [Any] = []
 public class RepositoryProvider<Repository> {
     @discardableResult
     public static func ready(_ repository: Repository) -> Repository {
+        if let repository = get() {
+            return repository
+        }
+
         repositories.append(repository)
         return repository
     }

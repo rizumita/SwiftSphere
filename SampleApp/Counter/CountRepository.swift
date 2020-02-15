@@ -7,7 +7,6 @@ import Combine
 
 protocol CountRepositoryProtocol {
     var count: Int { get }
-    var history: [Step] { get }
     var historyPublisher: AnyPublisher<[Step], Never> { get }
 
     func increase()
@@ -17,12 +16,14 @@ protocol CountRepositoryProtocol {
 
 class CountRepository: CountRepositoryProtocol {
     private(set) var count: Int = 0
-    @Published private(set) var history: [Step] = []
-    var historyPublisher: AnyPublisher<[Step], Never> { $history.eraseToAnyPublisher() }
+    private var historySubject = CurrentValueSubject<[Step], Never>([])
+    var historyPublisher: AnyPublisher<[Step], Never> { historySubject.eraseToAnyPublisher() }
 
     func increase() {
         count += 1
+        var history = historySubject.value
         history.append(.increase)
+        historySubject.value = history
     }
 
     func increaseAutomatically<P>(interval: TimeInterval, until: P) -> AnyPublisher<(), Never> where P: Publisher {
@@ -36,6 +37,8 @@ class CountRepository: CountRepositoryProtocol {
 
     func decrease() {
         count -= 1
+        var history = historySubject.value
         history.append(.decrease)
+        historySubject.value = history
     }
 }

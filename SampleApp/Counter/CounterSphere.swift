@@ -28,7 +28,7 @@ struct CounterSphere: SphereProtocol {
                 
             case .increaseAutomatically:
                 yield(context.countRepository.increaseAutomatically(interval: 2.0, until: context.until)
-                    .setFailureType(to: Error.self).flatMap { self.makeModelAsync(context: context) })
+                    .setFailureType(to: Error.self).flatMap { self.makeModel(context: context) })
                 
             case .stopIncreaseAutomatically:
                 context.until.send(())
@@ -37,17 +37,13 @@ struct CounterSphere: SphereProtocol {
                 context.countRepository.decrease()
             }
         
-            yield(makeModelAsync(context: context))
+            yield(makeModel(context: context))
         }
     }
     
-    static func makeModel(context: Context) -> Model {
-        Model(count: context.countRepository.count, history: context.countRepository.history)
-    }
-    
-    static func makeModelAsync(context: Context) -> Async<Model> {
+    static func makeModel(context: Context) -> Async<Model> {
         async { yield in
-            let history = try await(context.countRepository.historyPublisher.first())
+            let history = try await(context.countRepository.historyPublisher)
             yield(Model(count: context.countRepository.count, history: history))
         }
     }
