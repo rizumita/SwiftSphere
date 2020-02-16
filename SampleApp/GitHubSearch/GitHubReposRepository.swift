@@ -22,7 +22,7 @@ class GitHubReposRepository: GitHubReposRepositoryProtocol {
     private let setterQueue = DispatchQueue(label: "GitHubSearchRepository.setterQueue")
 
     func search(_ text: String) -> AnyPublisher<[GitHubRepo], GitHubSearchError> {
-        let urlString = "https://api.github.com/search/repositories?sort=stars&q=\(text)".trimmingCharacters(in: .whitespaces)
+        let urlString = "https://api.github.com/search/repositories?sort=stars&q=\(text)"
         let url = URL(string: urlString)!
         return URLSession(configuration: URLSessionConfiguration.default)
             .dataTaskPublisher(for: url)

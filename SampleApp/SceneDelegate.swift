@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import SwiftSphere
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -19,7 +20,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
         // Create the SwiftUI view that provides the window contents.
-        let contentView = ContentView()
+        let contentView = MultiProvider.ready([
+            Provider<GitHubSearchSphere>.ready(context: Provider.ready(GitHubReposRepository())),
+            Provider<CounterSphere>.ready(context: .init(countRepository: Provider.ready(CountRepository())))
+        ]) {
+            ContentView()
+                .environmentObject(Provider<GitHubSearchSphere>.get())
+                .environmentObject(Provider<CounterSphere>.get())
+        }
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {

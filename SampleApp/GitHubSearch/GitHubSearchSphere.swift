@@ -7,7 +7,7 @@ import Combine
 import SwiftSphere
 import CombineAsync
 
-struct GitHubSearchSphere: SphereProtocol {
+enum GitHubSearchSphere: SphereProtocol {
     struct Model {
         var repos: [GitHubRepo] = []
         var selectedRepo: GitHubRepo? = .none
@@ -27,7 +27,7 @@ struct GitHubSearchSphere: SphereProtocol {
                     yield(Model(repos: []))
                 } else {
                     yield(context
-                        .search(text)
+                        .search(text.trimmingCharacters(in: .whitespaces))
                         .map { Model(repos: $0) }
                         .catch { Just(Model(error: $0.localizedDescription)) })
                 }

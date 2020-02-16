@@ -14,18 +14,14 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 
-                SphereProvider<GitHubSearchSphere>.ready(context: RepositoryProvider.ready(GitHubReposRepository())) { sphere in
-                    NavigationLink(destination: GitHubSearchView().environmentObject(sphere),
-                                   label: { Text("Search GitHub Repositories") })
-                }
-                
+                NavigationLink(destination: GitHubSearchView(),
+                               label: { Text("Search GitHub Repositories") })
+
                 Spacer()
                 
-                SphereProvider<CounterSphere>.ready(context: .init(countRepository: RepositoryProvider.ready(CountRepository()))) { sphere in
-                    NavigationLink(destination: CounterView().environmentObject(sphere),
-                                   label: { Text("Counter") })
-                }
-                
+                NavigationLink(destination: CounterView(),
+                               label: { Text("Counter") })
+
                 Spacer()
             }
         }
