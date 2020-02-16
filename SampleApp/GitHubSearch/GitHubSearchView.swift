@@ -68,6 +68,6 @@ struct GitHubSearchView: View {
 
 struct GitHubSearchView_Previews: PreviewProvider {
     static var previews: some View {
-        GitHubSearchView().environmentObject(Provider<GitHubSearchSphere>.ready(context: GitHubReposRepository()))
+        GitHubSearchView().environmentObject(Provider.ready(GitHubSearchSphere.self, context: GitHubReposRepository()))
     }
 }

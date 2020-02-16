@@ -36,7 +36,7 @@ struct CounterView: View {
 struct CounterView_Previews: PreviewProvider {
     static var previews: some View {
         Provider.ready(CountRepository()) { _ in
-            CounterView().environmentObject(Provider<CounterSphere>.ready(context: .init(countRepository: CountRepository())))
+            CounterView().environmentObject(Provider.ready(CounterSphere.self, context: .init(countRepository: CountRepository())))
         }
     }
 }

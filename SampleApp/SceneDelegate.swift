@@ -20,13 +20,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
         // Create the SwiftUI view that provides the window contents.
-        let contentView = MultiProvider.ready([
-            Provider<GitHubSearchSphere>.ready(context: Provider.ready(GitHubReposRepository())),
-            Provider<CounterSphere>.ready(context: .init(countRepository: Provider.ready(CountRepository())))
+        let contentView = Provider.ready([
+            Provider.ready(GitHubReposRepository()),
+            Provider.ready(CountRepository()),
+            Provider.ready(GitHubSearchSphere.self, context: Provider.get()),
+            Provider.ready(CounterSphere.self, context: .init(countRepository: Provider.get()))
         ]) {
             ContentView()
-                .environmentObject(Provider<GitHubSearchSphere>.get())
-                .environmentObject(Provider<CounterSphere>.get())
+                .environmentObject(Provider.get(GitHubSearchSphere.self))
+                .environmentObject(Provider.get(CounterSphere.self))
         }
 
         // Use a UIHostingController as window root view controller.

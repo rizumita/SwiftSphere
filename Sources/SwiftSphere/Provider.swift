@@ -11,22 +11,14 @@ var providerItems: [AnyHashable : Any] = [AnyHashable : Any]()
 let providerQueue = DispatchQueue(label: "SwiftSphere.SphereProvider.proxyQueue")
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-public class Provider<Item> {
-    static func collectGarbage() {
-        for (key, value) in providerItems {
-            guard let value = value as? WeakRef,
-                  value.object == nil
-                else { continue }
-            providerItems.removeValue(forKey: key)
-        }
+public class Provider {
+    public static func ready<V>(_ items: [Any], build: () -> V) -> some View where V: View {
+        build()
     }
-}
 
-@available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-extension Provider where Item: AnyObject {
     @discardableResult
-    public static func ready(_ item: Item) -> Item {
-        if let repository = get() {
+    public static func ready<Item>(_ item: Item) -> Item where Item: AnyObject {
+        if let repository = get(Item.self) {
             return repository
         }
 
@@ -34,9 +26,9 @@ extension Provider where Item: AnyObject {
         return item
     }
 
-    public static func ready<V>(_ item: @autoclosure () -> Item,
-                                build: (Item) -> V) -> V {
-        if let repository = get() {
+    public static func ready<Item, V>(_ item: @autoclosure () -> Item,
+                                      build: (Item) -> V) -> V where Item: AnyObject {
+        if let repository = get(Item.self) {
             return build(repository)
         }
 
@@ -45,7 +37,7 @@ extension Provider where Item: AnyObject {
         return build(i)
     }
 
-    public static func get() -> Item! {
+    public static func get<Item>(_ type: Item.Type = Item.self) -> Item! {
         restore()
     }
     
@@ -57,7 +49,7 @@ extension Provider where Item: AnyObject {
     }
 
     static func restore<Item>(_ type: Item.Type = Item.self,
-                              for id: AnyHashable? = .none) -> Item? where Item: AnyObject {
+                              for id: AnyHashable? = .none) -> Item? {
         var result: Item?
 
         run(on: providerQueue) {
@@ -72,5 +64,14 @@ extension Provider where Item: AnyObject {
         }
 
         return result
+    }
+    
+    static func collectGarbage() {
+        for (key, value) in providerItems {
+            guard let value = value as? WeakRef,
+                  value.object == nil
+                else { continue }
+            providerItems.removeValue(forKey: key)
+        }
     }
 }
