@@ -9,44 +9,44 @@ import SwiftUI
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension Provider {
-    public static func ready<Item>(_ type: Item.Type = Item.self, context: Item.Context) -> Item.Proxy where Item: SphereProtocol {
+    public static func ready<Item>(_ type: Item.Type = Item.self, coordinator: Item.Coordinator) -> Item.Proxy where Item: SphereProtocol {
         if let sphereProxy = restore(Item.Proxy.self) {
             return sphereProxy
         }
 
-        let proxy = createProxy(Item.self, context: context)
+        let proxy = createProxy(Item.self, coordinator: coordinator)
         store(proxy)
         return proxy
     }
 
     @discardableResult
-    public static func ready<Item, ID>(_ type: Item.Type = Item.self, context: Item.Context, id: ID) -> Item.Proxy where Item: SphereProtocol, ID: Hashable {
+    public static func ready<Item, ID>(_ type: Item.Type = Item.self, coordinator: Item.Coordinator, id: ID) -> Item.Proxy where Item: SphereProtocol, ID: Hashable {
         if let sphereProxy: Item.Proxy = restore(Item.Proxy.self, for: id) {
             return sphereProxy
         }
 
-        let proxy = createProxy(Item.self, context: context)
+        let proxy = createProxy(Item.self, coordinator: coordinator)
         store(proxy, for: id)
         return proxy
     }
     
-    public static func ready<Item, V>(_ type: Item.Type = Item.self, context: Item.Context, build: (Item.Proxy) -> V) -> some View where Item: SphereProtocol, V: View {
+    public static func ready<Item, V>(_ type: Item.Type = Item.self, coordinator: Item.Coordinator, build: (Item.Proxy) -> V) -> some View where Item: SphereProtocol, V: View {
         if let sphereProxy = restore(Item.Proxy.self) {
             return build(sphereProxy)
         }
 
-        return build(ready(context: context))
+        return build(ready(coordinator: coordinator))
     }
 
     public static func ready<Item, V, ID>(_ type: Item.Type = Item.self,
-                                          context: Item.Context,
+                                          coordinator: Item.Coordinator,
                                           id: ID,
                                           build: (Item.Proxy) -> V) -> some View where Item: SphereProtocol, ID: Hashable, V: View {
         if let sphereProxy: Item.Proxy = restore(Item.Proxy.self, for: id) {
             return build(sphereProxy)
         }
 
-        return build(ready(context: context, id: id))
+        return build(ready(coordinator: coordinator, id: id))
     }
 
     public static func get<Item>(_ type: Item.Type = Item.self) -> Item.Proxy! where Item: SphereProtocol {
@@ -57,9 +57,9 @@ extension Provider {
         restore(for: id)
     }
 
-    private static func createProxy<Item>(_ type: Item.Type = Item.self, context: Item.Context) -> Item.Proxy where Item: SphereProtocol {
+    private static func createProxy<Item>(_ type: Item.Type = Item.self, coordinator: Item.Coordinator) -> Item.Proxy where Item: SphereProtocol {
         do {
-            return try Item.proxy(context: context).await()
+            return try Item.proxy(coordinator: coordinator).await()
         } catch {
             fatalError("Provider can't ready \(String(describing: Swift.type(of: Item.Proxy.self))): \(error.localizedDescription)")
         }

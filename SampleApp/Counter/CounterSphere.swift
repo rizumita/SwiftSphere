@@ -20,35 +20,35 @@ struct CounterSphere: SphereProtocol {
         case decrease
     }
     
-    static func update(event: Event, context: Context) -> Async<Model> {
+    static func update(event: Event, context: Context<Model, Coordinator>) -> Async<Model> {
         async { yield in
             switch event {
             case .increase:
-                context.countRepository.increase()
+                context.coordinator.countRepository.increase()
                 
             case .increaseAutomatically:
-                yield(context.countRepository.increaseAutomatically(interval: 2.0, until: context.until)
-                    .setFailureType(to: Error.self).flatMap { self.makeModel(context: context) })
+                yield(context.coordinator.countRepository.increaseAutomatically(interval: 2.0, until: context.coordinator.until)
+                    .setFailureType(to: Error.self).flatMap { self.makeModel(coordinator: context.coordinator) })
                 
             case .stopIncreaseAutomatically:
-                context.until.send(())
+                context.coordinator.until.send(())
                 
             case .decrease:
-                context.countRepository.decrease()
+                context.coordinator.countRepository.decrease()
             }
         
-            yield(makeModel(context: context))
+            yield(makeModel(coordinator: context.coordinator))
         }
     }
     
-    static func makeModel(context: Context) -> Async<Model> {
+    static func makeModel(coordinator: Coordinator) -> Async<Model> {
         async { yield in
-            let history = try await(context.countRepository.historyPublisher)
-            yield(Model(count: context.countRepository.count, history: history))
+            let history = try await(coordinator.countRepository.historyPublisher)
+            yield(Model(count: coordinator.countRepository.count, history: history))
         }
     }
     
-    struct Context {
+    struct Coordinator {
         let countRepository: CountRepositoryProtocol
         let until = PassthroughSubject<(), Never>()
     }

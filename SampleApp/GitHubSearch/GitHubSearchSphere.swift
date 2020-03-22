@@ -19,7 +19,7 @@ enum GitHubSearchSphere: SphereProtocol {
         case selectRepo(GitHubRepo?)
     }
     
-    static func update(event: Event, context: GitHubReposRepositoryProtocol) -> Async<Model> {
+    static func update(event: Event, context: Context<Model, GitHubReposRepositoryProtocol>) -> Async<Model> {
         async { yield in
             switch event {
             case .search(let text):
@@ -27,18 +27,19 @@ enum GitHubSearchSphere: SphereProtocol {
                     yield(Model(repos: []))
                 } else {
                     yield(context
+                        .coordinator
                         .search(text.trimmingCharacters(in: .whitespaces))
                         .map { Model(repos: $0) }
                         .catch { Just(Model(error: $0.localizedDescription)) })
                 }
                 
             case .selectRepo(let repo):
-                yield(Model(repos: context.searchedRepos, selectedRepo: repo))
+                yield(Model(repos: context.coordinator.searchedRepos, selectedRepo: repo))
             }
         }
     }
     
-    static func makeModel(context: GitHubReposRepositoryProtocol) -> Async<Model> {
+    static func makeModel(coordinator: GitHubReposRepositoryProtocol) -> Async<Model> {
         async { yield in
             yield(Model())
         }

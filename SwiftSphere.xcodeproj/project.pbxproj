@@ -33,6 +33,7 @@
 		6A62F88123E6BC3C0037E61F /* SphereProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A62F88023E6BC3C0037E61F /* SphereProtocol.swift */; };
 		6A62F88323E6BC5B0037E61F /* SphereProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A62F88223E6BC5B0037E61F /* SphereProxy.swift */; };
 		6A62F88823E6BCCF0037E61F /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A62F88723E6BCCF0037E61F /* Provider.swift */; };
+		6A895F962427024800FA885A /* SphereContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A895F952427024800FA885A /* SphereContext.swift */; };
 		6AAD65E423F8E815005557C5 /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAD65E323F8E815005557C5 /* Functions.swift */; };
 		6AAD65E623F8EB41005557C5 /* Provider+Sphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAD65E523F8EB41005557C5 /* Provider+Sphere.swift */; };
 		CB8760D390CF26A98C243CD6 /* CounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8763D1A6B20E86A16ECE05 /* CounterView.swift */; };
@@ -101,6 +102,7 @@
 		6A62F88023E6BC3C0037E61F /* SphereProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SphereProtocol.swift; sourceTree = "<group>"; };
 		6A62F88223E6BC5B0037E61F /* SphereProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SphereProxy.swift; sourceTree = "<group>"; };
 		6A62F88723E6BCCF0037E61F /* Provider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Provider.swift; sourceTree = "<group>"; };
+		6A895F952427024800FA885A /* SphereContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SphereContext.swift; sourceTree = "<group>"; };
 		6AAD65E323F8E815005557C5 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		6AAD65E523F8EB41005557C5 /* Provider+Sphere.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Provider+Sphere.swift"; sourceTree = "<group>"; };
 		CB876192F58F6D3AD25C5C02 /* GitHubSearchSphere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GitHubSearchSphere.swift; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 				6AAD65E523F8EB41005557C5 /* Provider+Sphere.swift */,
 				CB876D85B7CFBDFCA69F2408 /* WeakRef.swift */,
 				6AAD65E323F8E815005557C5 /* Functions.swift */,
+				6A895F952427024800FA885A /* SphereContext.swift */,
 			);
 			name = SwiftSphere;
 			path = Sources/SwiftSphere;
@@ -424,6 +427,7 @@
 				6A62F88323E6BC5B0037E61F /* SphereProxy.swift in Sources */,
 				6AAD65E423F8E815005557C5 /* Functions.swift in Sources */,
 				6A62F88823E6BCCF0037E61F /* Provider.swift in Sources */,
+				6A895F962427024800FA885A /* SphereContext.swift in Sources */,
 				6AAD65E623F8EB41005557C5 /* Provider+Sphere.swift in Sources */,
 				CB876468F92829068431A3CC /* WeakRef.swift in Sources */,
 			);

@@ -23,8 +23,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let contentView = Provider.ready([
             Provider.ready(GitHubReposRepository()),
             Provider.ready(CountRepository()),
-            Provider.ready(GitHubSearchSphere.self, context: Provider.get()),
-            Provider.ready(CounterSphere.self, context: .init(countRepository: Provider.get()))
+            Provider.ready(GitHubSearchSphere.self, coordinator: Provider.get()),
+            Provider.ready(CounterSphere.self, coordinator: .init(countRepository: Provider.get()))
         ]) {
             ContentView()
                 .environmentObject(Provider.get(GitHubSearchSphere.self))

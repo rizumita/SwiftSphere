@@ -15,23 +15,19 @@ import CombineAsync
 public protocol SphereProtocol {
     associatedtype Model
     associatedtype Event
-    associatedtype Context = ()
+    associatedtype Coordinator = ()
 
-    static func update(event: Event, context: Context) -> Async<Model>
-    static func makeModel(context: Context) -> Async<Model>
+    static func update(event: Event, context: Context<Model, Coordinator>) -> Async<Model>
+    static func makeModel(coordinator: Coordinator) -> Async<Model>
 }
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public extension SphereProtocol {
     typealias Proxy = SphereProxy<Self>
-}
-
-@available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-public extension SphereProtocol where Context == () {
-    static func makeContext() -> () { () }
+    typealias Context<Model, Coordinator> = SphereContext<Model, Coordinator>
 }
 
 @available(OSX 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension SphereProtocol {
-    static func proxy(context: Context) -> Async<SphereProxy<Self>> { SphereProxy<Self>.spawn(context: context) }
+    static func proxy(coordinator: Coordinator) -> Async<SphereProxy<Self>> { SphereProxy<Self>.spawn(coordinator: coordinator) }
 }

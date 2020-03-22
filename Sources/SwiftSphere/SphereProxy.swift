@@ -17,25 +17,25 @@ public class SphereProxy<Sphere: SphereProtocol>: ObservableObject {
     @Published public var model: Sphere.Model
     @Published public var error: Error?
     
-    private let context: Sphere.Context
+    private let coordinator: Sphere.Coordinator
     
     private let updateQueue = DispatchQueue(label: "SwiftSphere.SphereProxy.updateQueue")
     
-    static func spawn(context: Sphere.Context) -> Async<Sphere.Proxy> {
+    static func spawn(coordinator: Sphere.Coordinator) -> Async<Sphere.Proxy> {
         async { yield in
-            let model = try await(Sphere.makeModel(context: context))
-            yield(Sphere.Proxy(context: context, model: model))
+            let model = try await(Sphere.makeModel(coordinator: coordinator))
+            yield(Sphere.Proxy(coordinator: coordinator, model: model))
         }
     }
     
-    init(context: Sphere.Context, model: Sphere.Model) {
-        self.context = context
+    init(coordinator: Sphere.Coordinator, model: Sphere.Model) {
+        self.coordinator = coordinator
         self.model = model
     }
     
     public func dispatch(_ event: Sphere.Event) {
         let subscriber = Subscribers.Assign<SphereProxy<Sphere>, Sphere.Model>(object: self, keyPath: \.model)
-        Sphere.update(event: event, context: context)
+        Sphere.update(event: event, context: Sphere.Context(model: model, coordinator: coordinator))
             .subscribe(on: updateQueue)
             .receive(on: RunLoop.main)
             .catch { [weak self] error -> Empty<Sphere.Model, Never> in
